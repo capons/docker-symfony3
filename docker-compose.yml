@@ -6,7 +6,7 @@ services:
         image: mysql
         #dns: 192.168.1.1
         ports:
-           - "56000:3306"
+           - "3306:3306"
         volumes:
             - "./.data/db:/var/lib/mysql"
         environment:
@@ -18,7 +18,7 @@ services:
     phpmyadmin:
         image: phpmyadmin/phpmyadmin
         links:
-            - mydb:mysql
+            - mydb
         ports:
             - 85:80
         #restart: always
@@ -26,6 +26,8 @@ services:
         #volumes:
         #    - "./.data/db:/var/lib/mysql"
         environment:
+            PMA_HOST: mydb
+            PMA_PORT: 3306
             MYSQL_USERNAME: "root"
             MYSQL_ROOT_PASSWORD: "root"
 

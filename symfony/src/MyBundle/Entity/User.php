@@ -2,15 +2,28 @@
 
 namespace MyBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * @ORM\Table(name="app_users")
+ * @ORM\Table(name="users")
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
  */
 class User implements UserInterface, \Serializable
 {
+
+
+    public function __construct()
+    {
+        $this->images = new ArrayCollection();
+        $this->isActive = true;
+        // may not be needed, see section on salt below
+        // $this->salt = md5(uniqid('', true));
+    }
+
+
     /**
      * @ORM\Column(type="integer")
      * @ORM\Id
@@ -20,16 +33,19 @@ class User implements UserInterface, \Serializable
 
     /**
      * @ORM\Column(type="string", length=25, unique=true)
+     * @Assert\NotBlank()
      */
     private $username;
 
     /**
-     * @ORM\Column(type="string", length=64)
+     * @ORM\Column(type="string")
+     * @Assert\NotBlank()
      */
     private $password;
 
     /**
      * @ORM\Column(type="string", length=60, unique=true)
+     * @Assert\NotBlank()
      */
     private $email;
 
@@ -38,11 +54,9 @@ class User implements UserInterface, \Serializable
      */
     private $isActive = true;
 
-    public function __construct()
+    public function getId()
     {
-        $this->isActive = true;
-        // may not be needed, see section on salt below
-        // $this->salt = md5(uniqid('', true));
+        return $this->id;
     }
 
     public function getUsername()
@@ -84,7 +98,7 @@ class User implements UserInterface, \Serializable
 
     public function getRoles()
     {
-        return array('ROLE_USER');
+        return ['test'];
     }
 
     public function eraseCredentials()
@@ -114,4 +128,16 @@ class User implements UserInterface, \Serializable
             // $this->salt
             ) = unserialize($serialized);
     }
+
+    /**
+     * @ORM\OneToMany(targetEntity="MyBundle\Entity\Image", mappedBy="user", cascade={"persist", "remove"})
+     */
+    public $images;
+
+
+    public function getImage()
+    {
+        return $this->images;
+    }
+    
 }
